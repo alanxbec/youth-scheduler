@@ -51,8 +51,8 @@ export default async function LoginPage({
         <LoginForm urlError={error} />
 
         <p className="mt-8 text-xs text-muted leading-relaxed">
-          No password needed — we email you a one-time sign-in link. First time here? Signing in
-          creates your calendar automatically.
+          First time here? Use &quot;Create an account&quot; below — signing in creates your
+          calendar automatically.
         </p>
       </div>
     </main>

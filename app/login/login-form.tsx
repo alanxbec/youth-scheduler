@@ -1,18 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState } from "react";
-import { sendMagicLink, type LoginState } from "@/app/auth/actions";
+import { signInWithPassword, signUpWithPassword, type LoginState } from "@/app/auth/actions";
 
 export function LoginForm({ urlError }: { urlError?: string }) {
-  const [state, formAction, pending] = useActionState<LoginState, FormData>(sendMagicLink, {});
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const action = mode === "signin" ? signInWithPassword : signUpWithPassword;
+  const [state, formAction, pending] = useActionState<LoginState, FormData>(action, {});
 
   if (state.sent) {
     return (
       <div className="rise-in rounded-xl border border-line bg-surface p-5" role="status">
-        <h2 className="font-medium">Check your email</h2>
+        <h2 className="font-medium">Confirm your email</h2>
         <p className="mt-1.5 text-sm text-muted leading-relaxed">
-          We sent you a sign-in link. Open it on this device and you&apos;ll land on your
-          dashboard. The link expires after a while, so use it soon.
+          We sent a confirmation link to finish creating your account. Click it, then come back
+          here and sign in with your email and password.
         </p>
       </div>
     );
@@ -35,6 +38,22 @@ export function LoginForm({ urlError }: { urlError?: string }) {
         />
       </div>
 
+      <div>
+        <label htmlFor="password" className="field-label">
+          Password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete={mode === "signin" ? "current-password" : "new-password"}
+          required
+          minLength={mode === "signup" ? 6 : undefined}
+          placeholder="••••••••"
+          className="field"
+        />
+      </div>
+
       {(state.error || urlError) && (
         <p className="text-sm text-danger" role="alert" aria-live="polite">
           {state.error ?? urlError}
@@ -42,7 +61,23 @@ export function LoginForm({ urlError }: { urlError?: string }) {
       )}
 
       <button type="submit" disabled={pending} className="btn-primary w-full py-2.5">
-        {pending ? "Sending link…" : "Email me a sign-in link"}
+        {pending
+          ? mode === "signin"
+            ? "Signing in…"
+            : "Creating account…"
+          : mode === "signin"
+            ? "Sign In"
+            : "Create Account"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+        className="text-sm text-muted hover:text-ink underline underline-offset-2 w-full text-center"
+      >
+        {mode === "signin"
+          ? "New case manager? Create an account"
+          : "Already have an account? Sign in"}
       </button>
     </form>
   );

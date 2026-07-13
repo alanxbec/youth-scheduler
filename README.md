@@ -109,8 +109,11 @@ automatically. Then:
   Monday everywhere.
 - `app/s/[token]/` — the public youth page (mobile-first, no login).
 - `app/dashboard/`, `app/settings/` — the CM side (magic-link auth, RLS).
-- `lib/notify.ts` — **v2 TODO**: email the CM when a youth books. Stubbed, not
-  built.
+- `lib/notify.ts` — emails the CM (via Resend's HTTP API) the moment a youth
+  books. Requires `RESEND_API_KEY`; skipped silently if unset. Uses Resend's
+  shared sender, which can only deliver to your own Resend signup address —
+  fine here, since the CM is the account owner. Emailing *youth* (arbitrary
+  addresses) would need a verified custom domain in Resend first.
 
 ## Limits worth knowing
 

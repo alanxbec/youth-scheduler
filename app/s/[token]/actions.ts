@@ -8,6 +8,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { addDays, appNow, fromDateStr, isWeekday, mondayOf, toDateStr } from "@/lib/dates";
 import { availableSlots, conflictsWithDay, minToTime, timeToMin, toDayMeetings } from "@/lib/slots";
+import { notifyCmOfBooking } from "@/lib/notify";
 import type { CaseManager, Meeting } from "@/lib/types";
 
 export interface BookResult {
@@ -33,13 +34,13 @@ export async function bookSlot(
 
   const { data: cmRow } = await supabase
     .from("case_managers")
-    .select("id, buffer_minutes, work_start, work_end, slot_minutes")
+    .select("id, email, buffer_minutes, work_start, work_end, slot_minutes")
     .eq("share_token", token)
     .maybeSingle();
   if (!cmRow) return { error: "This link isn't valid anymore. Ask your case manager for a new one." };
   const cm = cmRow as Pick<
     CaseManager,
-    "id" | "buffer_minutes" | "work_start" | "work_end" | "slot_minutes"
+    "id" | "email" | "buffer_minutes" | "work_start" | "work_end" | "slot_minutes"
   >;
 
   // Date must be a weekday inside the current Mon–Fri week, and not in the past.
@@ -98,7 +99,11 @@ export async function bookSlot(
     return { error: "Couldn't save your time. Please try again." };
   }
 
-  // v2 TODO (lib/notify.ts): email the CM about this new booking.
+  void notifyCmOfBooking(cm.email, {
+    meeting_date: date,
+    start_min: startMin,
+    client_initials: initials,
+  });
 
   return { ok: true };
 }

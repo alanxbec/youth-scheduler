@@ -5,6 +5,7 @@
 // Everything the client sends is re-validated here — including the buffer
 // rule — so two youth can't grab the same or too-close slots (race guard).
 
+import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { addDays, appNow, fromDateStr, isWeekday, mondayOf, toDateStr } from "@/lib/dates";
 import { availableSlots, conflictsWithDay, minToTime, timeToMin, toDayMeetings } from "@/lib/slots";
@@ -99,11 +100,18 @@ export async function bookSlot(
     return { error: "Couldn't save your time. Please try again." };
   }
 
-  void notifyCmOfBooking(cm.email, {
-    meeting_date: date,
-    start_min: startMin,
-    client_initials: initials,
-  });
+  // Run post-response via after(): a bare fire-and-forget promise gets killed
+  // when Vercel freezes the function right after the action returns, so the
+  // Resend fetch never completed. after() keeps the function alive until the
+  // notification attempt finishes, without making the youth wait on it.
+  // notifyCmOfBooking swallows its own errors, so it can never fail a booking.
+  after(() =>
+    notifyCmOfBooking(cm.email, {
+      meeting_date: date,
+      start_min: startMin,
+      client_initials: initials,
+    })
+  );
 
   return { ok: true };
 }

@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Weekly Check-In — design tokens
+   Committed light theme: this tool is used in daylight (an office laptop, a
+   phone on the bus). Pure white surface; the brand lives in a deep olive
+   green (calm, growing, trustworthy) with an amber accent reserved for
+   "new booking" moments. All colors OKLCH.
+--------------------------------------------------------------------------- */
+
+:root {
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.973 0.006 110); /* panels, day columns */
+  --line: oklch(0.905 0.012 110);
+  --line-strong: oklch(0.82 0.016 110);
+
+  --ink: oklch(0.24 0.02 110); /* ~16:1 on bg */
+  --muted: oklch(0.46 0.02 110); /* ~7:1 on bg */
+
+  --primary: oklch(0.46 0.09 115); /* deep olive green; white text on fills */
+  --primary-deep: oklch(0.39 0.085 115);
+  --primary-soft: oklch(0.945 0.032 118); /* selected / scheduled tint */
+  --primary-soft-ink: oklch(0.36 0.08 115);
+
+  --accent-soft: oklch(0.945 0.05 80); /* amber tint — new client bookings */
+  --accent-ink: oklch(0.47 0.115 62);
+
+  --danger: oklch(0.5 0.185 27);
+  --danger-soft: oklch(0.955 0.02 27);
+
+  --ring: oklch(0.55 0.1 115);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-ink: var(--primary-soft-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* One control vocabulary for the whole app. */
+@layer components {
+  .btn,
+  .btn-primary,
+  .btn-ghost,
+  .btn-quiet {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-medium
+      transition-colors duration-150 select-none
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-deep px-4 py-2;
+  }
+  .btn-ghost {
+    @apply text-ink hover:bg-surface border border-line px-3 py-1.5;
+  }
+  .btn-quiet {
+    @apply text-muted hover:text-ink hover:bg-surface px-2.5 py-1.5;
+  }
+  .field {
+    @apply w-full rounded-lg border border-line-strong bg-bg px-3 py-2 text-sm text-ink
+      placeholder:text-muted
+      focus:outline-2 focus:outline-offset-1 focus:outline-ring;
+  }
+  .field-label {
+    @apply block text-sm font-medium text-ink mb-1;
+  }
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Gentle entrance for the youth booking confirmation. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.pop-in {
+  animation: pop-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}

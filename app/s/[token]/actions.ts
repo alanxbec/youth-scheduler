@@ -6,7 +6,7 @@
 // rule — so two youth can't grab the same or too-close slots (race guard).
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { addDays, fromDateStr, isWeekday, mondayOf, toDateStr } from "@/lib/dates";
+import { addDays, appNow, fromDateStr, isWeekday, mondayOf, toDateStr } from "@/lib/dates";
 import { availableSlots, conflictsWithDay, minToTime, timeToMin, toDayMeetings } from "@/lib/slots";
 import type { CaseManager, Meeting } from "@/lib/types";
 
@@ -44,9 +44,9 @@ export async function bookSlot(
 
   // Date must be a weekday inside the current Mon–Fri week, and not in the past.
   const day = fromDateStr(date);
-  const monday = mondayOf(new Date());
+  const monday = mondayOf(appNow());
   const friday = addDays(monday, 4);
-  const todayStr = toDateStr(new Date());
+  const todayStr = toDateStr(appNow());
   if (!isWeekday(day)) return { error: "Meetings are Monday to Friday only." };
   if (date < toDateStr(monday) || date > toDateStr(friday))
     return { error: "That day isn't in this week. Refresh and pick again." };
@@ -64,7 +64,7 @@ export async function bookSlot(
     return { error: "That time isn't available. Refresh and pick again." };
   }
   if (date === todayStr) {
-    const now = new Date();
+    const now = appNow();
     if (startMin <= now.getHours() * 60 + now.getMinutes())
       return { error: "That time already passed today. Pick a later one." };
   }
@@ -124,7 +124,7 @@ export async function getWeekAvailability(token: string): Promise<DaySlots[] | n
     "id" | "buffer_minutes" | "work_start" | "work_end" | "slot_minutes"
   >;
 
-  const monday = mondayOf(new Date());
+  const monday = mondayOf(appNow());
   const dates = [0, 1, 2, 3, 4].map((i) => toDateStr(addDays(monday, i)));
 
   const { data: meetings } = await supabase
@@ -141,7 +141,7 @@ export async function getWeekAvailability(token: string): Promise<DaySlots[] | n
     byDate.set(m.meeting_date, list);
   }
 
-  const now = new Date();
+  const now = appNow();
   const todayStr = toDateStr(now);
   const nowMin = now.getHours() * 60 + now.getMinutes();
 

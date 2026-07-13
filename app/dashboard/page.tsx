@@ -5,6 +5,7 @@ import { getOrCreateCm } from "@/lib/cm";
 import { signOut } from "@/app/auth/actions";
 import {
   addDays,
+  appNow,
   fromDateStr,
   mondayOf,
   toDateStr,
@@ -29,10 +30,10 @@ export default async function DashboardPage({
 
   const cm = await getOrCreateCm(supabase, user);
 
-  const anchor = w && /^\d{4}-\d{2}-\d{2}$/.test(w) ? fromDateStr(w) : new Date();
+  const anchor = w && /^\d{4}-\d{2}-\d{2}$/.test(w) ? fromDateStr(w) : appNow();
   const monday = mondayOf(anchor);
   const days = weekDays(monday);
-  const thisMonday = mondayOf(new Date());
+  const thisMonday = mondayOf(appNow());
 
   const { data: meetings } = await supabase
     .from("meetings")
@@ -49,7 +50,7 @@ export default async function DashboardPage({
     byDate.set(m.meeting_date, list);
   }
 
-  const todayStr = toDateStr(new Date());
+  const todayStr = toDateStr(appNow());
   const prev = toDateStr(addDays(monday, -7));
   const next = toDateStr(addDays(monday, 7));
   const isThisWeek = toDateStr(monday) === toDateStr(thisMonday);

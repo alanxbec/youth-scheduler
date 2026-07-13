@@ -5,7 +5,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { bookSlot, getWeekAvailability, type DaySlots } from "./actions";
-import { fromDateStr, longDate, toDateStr } from "@/lib/dates";
+import { appNow, fromDateStr, longDate, toDateStr } from "@/lib/dates";
 import { minToLabel } from "@/lib/slots";
 
 interface DoneInfo {
@@ -26,7 +26,7 @@ export function Booking({
   initialDays: DaySlots[];
 }) {
   const [days, setDays] = useState<DaySlots[]>(initialDays);
-  const todayStr = toDateStr(new Date());
+  const todayStr = toDateStr(appNow());
 
   const firstOpenDate = useMemo(() => {
     const open = days.find((d) => d.slots.length > 0);

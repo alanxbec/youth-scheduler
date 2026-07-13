@@ -4,6 +4,38 @@
 
 export const WEEKDAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
+// The org's fixed timezone. Hardcoded here (not an env var) because Vercel
+// reserves the TZ environment variable and won't let it be set from the
+// dashboard. appNow() computes wall-clock "now" in this zone directly, so
+// "today"/"current time" checks are correct no matter what timezone the
+// server process itself happens to be running in.
+const APP_TIMEZONE = "America/Los_Angeles";
+
+/** Current wall-clock instant in APP_TIMEZONE, as a Date whose local getters
+ *  (getFullYear/getHours/etc.) read back that timezone's date and time. */
+export function appNow(): Date {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: APP_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+  return new Date(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour") % 24,
+    get("minute"),
+    get("second")
+  );
+}
+
 /** Local YYYY-MM-DD (no UTC shifting). */
 export function toDateStr(d: Date): string {
   const y = d.getFullYear();

@@ -3,7 +3,7 @@
 // service-role server code in actions.ts, never the client-side anon key.
 
 import type { Metadata } from "next";
-import { mondayOf, weekLabel } from "@/lib/dates";
+import { appNow, mondayOf, weekLabel } from "@/lib/dates";
 import { getWeekAvailability } from "./actions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Booking } from "./booking";
@@ -51,7 +51,7 @@ export default async function YouthBookingPage({
   }
 
   const days = await getWeekAvailability(token);
-  const monday = mondayOf(new Date());
+  const monday = mondayOf(appNow());
   const firstName = cmName.split(" ")[0];
 
   return (

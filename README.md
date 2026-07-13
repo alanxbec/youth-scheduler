@@ -81,8 +81,9 @@ automatically. Then:
    and import the repo. Framework is auto-detected (Next.js) — no build
    settings to change.
 3. Under **Environment Variables**, add the same three values from
-   `.env.local`, plus `TZ` set to your timezone (e.g. `America/Los_Angeles`)
-   so "today" and past-time hiding behave correctly (Vercel servers run in UTC).
+   `.env.local`. (No `TZ` variable needed — Vercel reserves that name and
+   won't let you set it; the app computes "today"/"now" in a fixed timezone
+   in code instead. See `lib/dates.ts`.)
 4. Deploy, then add the production redirect URLs in Supabase (step 5 above)
    and update the Supabase **Site URL** to your Vercel URL.
 
@@ -101,8 +102,11 @@ automatically. Then:
   slot grid **and** re-validates on submit, so two youth can't grab the same or
   too-close slots. A unique DB index on `(cm_id, meeting_date, start_time)` is
   the hard backstop for the exact-same-slot race.
-- `lib/dates.ts` — weekday-only week math. Saturdays/Sundays roll forward to
-  the next Monday everywhere.
+- `lib/dates.ts` — weekday-only week math, plus `appNow()`: computes
+  wall-clock "now" in a fixed timezone (`America/Los_Angeles` by default,
+  edit the `APP_TIMEZONE` constant to change it) regardless of what timezone
+  the server itself runs in. Saturdays/Sundays roll forward to the next
+  Monday everywhere.
 - `app/s/[token]/` — the public youth page (mobile-first, no login).
 - `app/dashboard/`, `app/settings/` — the CM side (magic-link auth, RLS).
 - `lib/notify.ts` — **v2 TODO**: email the CM when a youth books. Stubbed, not
@@ -110,9 +114,10 @@ automatically. Then:
 
 ## Limits worth knowing
 
-- Times are naive local times (no timezone column). Set `TZ` on Vercel and
-  everyone — CMs and youth — is assumed to be in that one timezone. Fine for a
-  single-region nonprofit.
+- Times are naive local times (no timezone column). Everyone — CMs and
+  youth — is assumed to be in the single timezone set in `lib/dates.ts`
+  (`APP_TIMEZONE`). Fine for a single-region nonprofit; edit that constant
+  if you ever need a different one.
 - Supabase's built-in email service allows only a handful of magic-link emails
   per hour. Plenty for a few CMs; if you add many, wire up custom SMTP in
   Supabase Auth settings.

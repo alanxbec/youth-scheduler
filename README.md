@@ -18,6 +18,23 @@ Free to run on Vercel + Supabase, and maintainable by one person.
 
 ---
 
+## Screenshots
+
+**Case manager — sign in**
+
+![Sign-in page](screenshots/sign-in.png)
+
+**Case manager — weekly dashboard** (add/edit/remove meetings, mark done or
+missed, youth self-bookings tagged "New")
+
+![CM dashboard](screenshots/dashboard.png)
+
+**Youth — booking page** (mobile, no login: pick a day, pick an open time)
+
+![Youth booking page](screenshots/youth-pick-a-time.png)
+
+---
+
 ## What's built (v1)
 
 - **CM auth**: email + password (Supabase Auth). First sign-in auto-creates
